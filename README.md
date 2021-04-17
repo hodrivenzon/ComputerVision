@@ -1,5 +1,3 @@
-# MachineLearning
+# ComputerVisionProjects
 
-Deep Learning:
 
-Generative Adversarial Networks (GANs)

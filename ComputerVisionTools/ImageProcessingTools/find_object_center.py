@@ -79,10 +79,10 @@ if __name__ == '__main__':
     img = cv2.imread(r"C:\Users\hodda\Downloads\plate.PNG")
     # img = cv2.imread(r"C:\Users\hodda\Downloads\plate_2.PNG")
     # img = cv2.imread(r"C:\Users\hodda\Downloads\plate_3.PNG")
-    img = cv2.imread(r"C:\Users\hodda\Downloads\plate_4.PNG")
+    # img = cv2.imread(r"C:\Users\hodda\Downloads\plate_4.PNG")
     # img = cv2.imread(r"C:\Users\hodda\Downloads\plate_5.PNG")
     # img = cv2.imread(r"C:\Users\hodda\Downloads\car.PNG")
-    # img = cv2.imread(r"C:\Users\hodda\Downloads\model.PNG")
+    img = cv2.imread(r"C:\Users\hodda\Downloads\model.PNG")
     # img = cv2.imread(r"C:\Users\hodda\Downloads\elephant.PNG")
 
     draw_object_center(img)

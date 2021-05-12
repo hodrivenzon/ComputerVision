@@ -107,15 +107,22 @@ def adding_drawing_on_face():
         ret, img = cap.read()
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+        # dst = cv2.imread(r"C:\Users\hodda\PycharmProjects\Bootcamp\ComputerVisionTools\datasets\mustache.PNG")
+        dst = cv2.imread(r"C:\Users\hodda\PycharmProjects\Bootcamp\ComputerVisionTools\datasets\lips.PNG")
 
         for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            L = y + h//2
+            R = x + w//10
+            img[L:dst.shape[0] + L, R:dst.shape[1] + R] = dst
+
+            # cv2.imread("\datasets\mustache.PNG")
             roi_gray = gray[y:y + h, x:x + w]
             roi_color = img[y:y + h, x:x + w]
 
-            eyes = eye_cascade.detectMultiScale(roi_gray)
-            for (ex, ey, ew, eh) in eyes:
-                cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2)
+            # eyes = eye_cascade.detectMultiScale(roi_gray)
+            # for (ex, ey, ew, eh) in eyes:
+            #     cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2)
 
         cv2.imshow('img', img)
 
@@ -126,9 +133,18 @@ def adding_drawing_on_face():
 
 
 if __name__ == '__main__':
+    dst = cv2.imread(r"C:\Users\hodda\PycharmProjects\Bootcamp\ComputerVisionTools\datasets\mustache.PNG", 0)
+    img2 = cv2.imread(r'C:\Users\hodda\Downloads\messi_1.PNG', 0)
 
+    # img2[] = dst
 
-    face_recognition()
+    # dst = cv2.addWeighted(img2, 0.7, img1, 0.3, 0)
+    # img2[0:dst.shape[0], 0:dst.shape[1]] = dst
+    # cv2.imshow('dst', img2)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
+    adding_drawing_on_face()
 
 
     print()

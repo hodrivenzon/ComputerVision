@@ -7,9 +7,13 @@ from tf2_yolov4.anchors import YOLOV4_ANCHORS
 from tf2_yolov4.model import YOLOv4
 import cv2
 import time
-from time import gmtime, strftime
-import datetime
+
+from datetime import datetime
+from time import gmtime, strftime, localtime
 import pandas as pd
+
+
+
 
 def load_image_to_tensor(file):
     # load image
@@ -32,7 +36,6 @@ def screen_record():
         return printscreen
 
 def detected_photo(boxes, scores, classes, detections,image):
-    # image = np.array(ImageGrab.grab(bbox=(600, 400, 1400, 900)))
     HEIGHT, WIDTH = (image.shape[0]//32)*32, (image.shape[1]//32)*32
     boxes = (boxes[0] * [WIDTH, HEIGHT, WIDTH, HEIGHT]).astype(int)
     scores = scores[0]
@@ -53,7 +56,6 @@ def detected_photo(boxes, scores, classes, detections,image):
         'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
     ]
     ########################################################################
-
 
     image_cv = image.numpy()
 
@@ -85,10 +87,7 @@ def detected_photo(boxes, scores, classes, detections,image):
                 cv2.putText(image_cv, text, (int(xmin), int(ymin) - 5),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
                 cars_count += 1
-
-
     print(f"cars_count:{cars_count}")
-
     return image_cv, cars_count
 
 def resize_image(image):
@@ -130,39 +129,74 @@ def proccess_frame(photo, model):
     return result_img, cars_count
 
 def main():
-    # screen = screen_record()
     yolo_model = trained_yolov4_model()
     last_time = time.time()
     cars_count_list = []
+    cars_count_old = 0
+    video_stopped_count = 0
+    repeat = 0
+
     while(True):
+        now = datetime.now()
         # 800x600 windowed mode
         printscreen = np.array(ImageGrab.grab(bbox=(600, 400, 1400, 900)))
-        print('loop took {} seconds'.format(time.time()-last_time))
+        # print('loop took {} seconds'.format(time.time()-last_time))
         last_time = time.time()
         cv2.imshow('window', cv2.cvtColor(printscreen, cv2.COLOR_BGR2RGB))
 
         image, cars_count = proccess_frame(printscreen, yolo_model)
-        cars_count_list.append([strftime("%Y-%m-%d %H:%M:%S", gmtime()), cars_count])
+        if video_stopped_count < 2:
+            cars_count_list.append([now.strftime("%d_%m_%Y_%H_%M_%S"), cars_count])
         # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         cv2.imshow('window', cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
-        if cv2.waitKey(25) & 0xFF == ord('q'):
-            pd.DataFrame(cars_count_list, columns=['date', 'cars_count']).to_csv(r'cars_count_files/cars_count_' + str(strftime("%Y_%m_%d_%H_%M_%S", gmtime())) +'.csv', index=False)
+        if cars_count_old == cars_count:
+            if cars_count != 0:
+                repeat += 1
+                if repeat > 5:
+                    video_stopped_count += 1
+                    repeat = 0
+            else:
+                video_stopped_count += 0.1
+        else:
+            video_stopped_count = 0
+            repeat = 0
+        cars_count_old = cars_count
+        print("\n")
+        print(f"video_stopped_count: {video_stopped_count}")
+        print(f"repeat: {repeat}")
+        print(f"sec_passed: {len(cars_count_list)}")
+        # print(str(now.strftime("%d_%m_%Y_%H_%M_%S")))
+
+        patience = 50
+        file_size = 3600
+
+        if len(cars_count_list) > file_size:
+            pd.DataFrame(cars_count_list, columns=['date', 'cars_count'])\
+                .to_csv(r'cars_count_files/cars_count_'
+                        + str(now.strftime("%d_%m_%Y_%H_%M_%S")) +'.csv', index=False)
+            print("[INFO] File saved to CSV.")
+            print("[INFO] Cause: Video length larger than 1 hour.")
+            cars_count_list = []
+
+        backup_file_size = (file_size // 100)
+
+        if len(cars_count_list) % backup_file_size == 0:
+            pd.DataFrame(cars_count_list, columns=['date', 'cars_count'])\
+                .to_csv(r'cars_count_files/backup_files/cars_count_backup_' + str(len(cars_count_list) // backup_file_size) + '.csv', index=False)
+            print("[INFO] File saved to backup CSV.")
+
+        if (cv2.waitKey(25) & 0xFF == ord('q')) or video_stopped_count > patience:
+            pd.DataFrame(cars_count_list, columns=['date', 'cars_count'])\
+                .to_csv(r'cars_count_files/cars_count_'
+                        + str(now.strftime("%d_%m_%Y_%H_%M_%S")) +'.csv', index=False)
+            print("[INFO] File saved to CSV.")
+            if video_stopped_count > patience:
+                print("[INFO] Cause: Video stopped.")
+            else:
+                print("[INFO] Cause: Stopped by User.")
             cv2.destroyAllWindows()
             break
-        # return printscreen
-
-    # last_time = time.time()
-    # printscreen = np.array(ImageGrab.grab(bbox=(600, 400, 1400, 900)))
-    # print('loop took {} seconds'.format(time.time() - last_time))
-    # last_time = time.time()
-    # cv2.imshow('window', cv2.cvtColor(printscreen, cv2.COLOR_BGR2RGB))
-
-    # image = proccess_frame(printscreen, yolo_model)
-    # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    # cv2.imshow('window', cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
 if __name__ == '__main__':
-    # WIDTH, HEIGHT = (800, 500)
-
     main()

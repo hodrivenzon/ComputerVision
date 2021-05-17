@@ -1,8 +1,4 @@
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-from DeepLearning import GAN
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -12,8 +8,14 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
-    GAN().main()
+    import pandas as pd
 
+    # url = "https://raw.githubusercontent.com/guipsamora/pandas_exercises/master/04_Apply/US_Crime_Rates/US_Crime_Rates_1960_2014.csv"
+    # crime = pd.read_csv(url, sep=',')
 
+    # url = 'https://raw.githubusercontent.com/justmarkham/DAT8/master/data/u.user'
+    # users = pd.read_csv(url, sep='|')
+    df = pd.read_csv(r"C:\Users\hodda\Downloads\NationalNames.csv\NationalNames.csv")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # y = users.groupby('occupation').age.mean()
+    print()
